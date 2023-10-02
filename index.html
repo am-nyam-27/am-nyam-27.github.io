@@ -144,36 +144,22 @@
             ballSpeedX *= -1;
         }
 
-        // Event listeners for mobile buttons
-        let upButtonPressed = false;
-        let downButtonPressed = false;
-
-        upButton.addEventListener("mousedown", () => {
+        // Event listeners for touch events on mobile
+        upButton.addEventListener("touchstart", () => {
             upButtonPressed = true;
         });
 
-        upButton.addEventListener("mouseup", () => {
+        upButton.addEventListener("touchend", () => {
             upButtonPressed = false;
         });
 
-        downButton.addEventListener("mousedown", () => {
+        downButton.addEventListener("touchstart", () => {
             downButtonPressed = true;
         });
 
-        downButton.addEventListener("mouseup", () => {
+        downButton.addEventListener("touchend", () => {
             downButtonPressed = false;
         });
-
-        // Game loop
-        setInterval(() => {
-            if (upButtonPressed && paddleLeftY > 0) {
-                paddleLeftY -= 10;
-            }
-            if (downButtonPressed && paddleLeftY < window.innerHeight - 100) {
-                paddleLeftY += 10;
-            }
-            update();
-        }, 1000 / 60);
     </script>
 </body>
 </html>
