@@ -79,6 +79,14 @@
                 paddleLeftY += 10;
             }
 
+            // AI-controlled movement for the right paddle
+            const paddleSpeed = 4;
+            if (ballY < paddleRightY + paddleRight.clientHeight / 2) {
+                paddleRightY -= paddleSpeed;
+            } else {
+                paddleRightY += paddleSpeed;
+            }
+
             // Move ball
             ballX += ballXSpeed;
             ballY += ballYSpeed;
