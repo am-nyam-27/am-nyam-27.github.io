@@ -7,201 +7,98 @@
     <style>
         body {
             margin: 0;
-            overflow: hidden;
-        }
-        #game-container {
-            position: relative;
-            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            background-color: black;
+            background-color: #222;
         }
-        #ball {
-            position: absolute;
-            width: 20px;
-            height: 20px;
-            background-color: white;
-            border-radius: 50%;
+
+        #game-board {
+            width: 600px;
+            height: 400px;
+            background-color: #333;
+            position: relative;
         }
-        #paddle-left, #paddle-right {
-            position: absolute;
+
+        .paddle {
             width: 10px;
             height: 100px;
             background-color: white;
+            position: absolute;
         }
-        #paddle-left {
+
+        #left-paddle {
             left: 0;
         }
-        #paddle-right {
+
+        #right-paddle {
             right: 0;
         }
-        #score {
+
+        .ball {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
             position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            font-size: 24px;
-        }
-        #buttons {
-            position: absolute;
-            bottom: 20px;
-            left: 10px;
-            text-align: center;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: white;
-            color: black;
-            border: none;
-            margin: 5px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="game-container">
-        <div id="ball"></div>
-        <div id="paddle-left"></div>
-        <div id="paddle-right"></div>
-        <div id="score">0 - 0</div>
-    </div>
-    <div id="buttons">
-        <button id="up-button">Up</button>
-        <button id="down-button">Down</button>
+    <div id="game-board">
+        <div class="paddle" id="left-paddle"></div>
+        <div class="paddle" id="right-paddle"></div>
+        <div class="ball" id="ball"></div>
     </div>
 
     <script>
+        const gameBoard = document.getElementById("game-board");
+        const leftPaddle = document.getElementById("left-paddle");
+        const rightPaddle = document.getElementById("right-paddle");
         const ball = document.getElementById("ball");
-        const paddleLeft = document.getElementById("paddle-left");
-        const paddleRight = document.getElementById("paddle-right");
-        const scoreDisplay = document.getElementById("score");
-        const upButton = document.getElementById("up-button");
-        const downButton = document.getElementById("down-button");
 
-        let ballX = 0;
-        let ballY = 0;
+        let ballX = 290;
+        let ballY = 190;
         let ballSpeedX = 5;
         let ballSpeedY = 5;
-        let paddleLeftY = 50;
-        let paddleRightY = 50;
-        let leftScore = 0;
-        let rightScore = 0;
+
+        function movePaddle() {
+            const mouseY = ballY - gameBoard.getBoundingClientRect().top;
+            const paddleSpeed = 5;
+
+            if (rightPaddle.getBoundingClientRect().top + rightPaddle.clientHeight / 2 < mouseY) {
+                rightPaddle.style.top = (rightPaddle.getBoundingClientRect().top + paddleSpeed) + "px";
+            } else {
+                rightPaddle.style.top = (rightPaddle.getBoundingClientRect().top - paddleSpeed) + "px";
+            }
+        }
 
         function update() {
-            // Move ball
             ballX += ballSpeedX;
             ballY += ballSpeedY;
 
-            // Ball collisions with top and bottom walls
-            if (ballY <= 0 || ballY >= window.innerHeight) {
+            if (ballX <= 0 || ballX >= gameBoard.clientWidth - ball.clientWidth) {
+                ballSpeedX *= -1;
+            }
+
+            if (ballY <= 0 || ballY >= gameBoard.clientHeight - ball.clientHeight) {
                 ballSpeedY *= -1;
             }
 
-            // Ball collisions with paddles
-            if (
-                ballX <= 15 &&
-                ballY >= paddleLeftY &&
-                ballY <= paddleLeftY + 100
-            ) {
-                ballSpeedX *= -1;
-            }
-            if (
-                ballX >= window.innerWidth - 35 &&
-                ballY >= paddleRightY &&
-                ballY <= paddleRightY + 100
-            ) {
+            if (ballX <= leftPaddle.clientWidth && ballY >= leftPaddle.getBoundingClientRect().top && ballY <= leftPaddle.getBoundingClientRect().bottom) {
                 ballSpeedX *= -1;
             }
 
-            // Ball out of bounds
-            if (ballX < 0) {
-                // Right player scores a point
-                rightScore++;
-                reset();
-            }
-            if (ballX > window.innerWidth - 20) {
-                // Left player scores a point
-                leftScore++;
-                reset();
-            }
+            movePaddle();
 
-            // Update paddles' positions
-            paddleLeft.style.top = `${paddleLeftY}px`;
-            paddleRight.style.top = `${paddleRightY}px`;
+            ball.style.left = ballX + "px";
+            ball.style.top = ballY + "px";
 
-            // Update the ball's position
-            ball.style.left = `${ballX}px`;
-            ball.style.top = `${ballY}px`;
-
-            // Update the score display
-            scoreDisplay.textContent = `${leftScore} - ${rightScore}`;
+            requestAnimationFrame(update);
         }
 
-        function reset() {
-            ballX = window.innerWidth / 2;
-            ballY = window.innerHeight / 2;
-            ballSpeedX *= -1;
-        }
-
-        // Variables to keep track of button state
-        let touchStartUp = false;
-        let touchStartDown = false;
-
-        // Function to handle touch start events
-        function handleTouchStart(event) {
-            if (event.target === upButton) {
-                touchStartUp = true;
-            } else if (event.target === downButton) {
-                touchStartDown = true;
-            }
-        }
-
-        // Function to handle touch end events
-        function handleTouchEnd(event) {
-            if (event.target === upButton) {
-                touchStartUp = false;
-            } else if (event.target === downButton) {
-                touchStartDown = false;
-            }
-        }
-
-        // Event listeners for touch events on mobile
-        upButton.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevent text selection
-            handleTouchStart(e);
-        });
-
-        upButton.addEventListener("touchend", (e) => {
-            e.preventDefault(); // Prevent text selection
-            handleTouchEnd(e);
-        });
-
-        downButton.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevent text selection
-            handleTouchStart(e);
-        });
-
-        downButton.addEventListener("touchend", (e) => {
-            e.preventDefault(); // Prevent text selection
-            handleTouchEnd(e);
-        });
-
-        // Function to continuously check button states and update paddle position
-        function checkButtonState() {
-            if (touchStartUp && paddleLeftY > 0) {
-                paddleLeftY -= 10;
-            }
-            if (touchStartDown && paddleLeftY < window.innerHeight - 100) {
-                paddleLeftY += 10;
-            }
-        }
-
-        // Game loop
-        setInterval(() => {
-            checkButtonState();
-            update();
-        }, 1000 / 60);
+        update();
     </script>
 </body>
 </html>
