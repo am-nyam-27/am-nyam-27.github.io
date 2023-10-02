@@ -3,161 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ping-Pong Game</title>
+    <title>Ping Pong Game</title>
     <style>
         body {
             margin: 0;
             overflow: hidden;
-            background-color: black;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
         }
-
-        #game-board {
-            width: 600px;
-            height: 400px;
-            background-color: white;
+        #game-container {
             position: relative;
+            width: 100%;
+            height: 100vh;
+            background-color: black;
         }
-
         #ball {
+            position: absolute;
             width: 20px;
             height: 20px;
-            background-color: red;
+            background-color: white;
             border-radius: 50%;
-            position: absolute;
         }
-
         #paddle-left, #paddle-right {
+            position: absolute;
             width: 10px;
-            height: 80px;
-            background-color: blue;
-            position: absolute;
+            height: 100px;
+            background-color: white;
         }
-
         #paddle-left {
-            left: 10px;
+            left: 0;
         }
-
         #paddle-right {
-            right: 10px;
+            right: 0;
         }
-
-        .control-buttons {
+        #score {
             position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-
-        .control-buttons button {
-            width: 40px;
-            height: 40px;
-            background-color: green;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             color: white;
+            font-size: 24px;
+        }
+        #buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: white;
+            color: black;
             border: none;
-            border-radius: 50%;
             margin: 5px;
             cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <div id="game-board">
+    <div id="game-container">
         <div id="ball"></div>
         <div id="paddle-left"></div>
         <div id="paddle-right"></div>
-        <div class="control-buttons">
-            <button id="up-button">Up</button>
-            <button id="down-button">Down</button>
-        </div>
+        <div id="score">0 - 0</div>
+    </div>
+    <div id="buttons">
+        <button id="up-button">Up</button>
+        <button id="down-button">Down</button>
     </div>
 
     <script>
-        const gameBoard = document.getElementById('game-board');
-        const ball = document.getElementById('ball');
-        const paddleLeft = document.getElementById('paddle-left');
-        const paddleRight = document.getElementById('paddle-right');
-        const upButton = document.getElementById('up-button');
-        const downButton = document.getElementById('down-button');
-        const boardWidth = gameBoard.clientWidth;
-        const boardHeight = gameBoard.clientHeight;
-        const ballSpeed = 5;
-        let ballXSpeed = ballSpeed;
-        let ballYSpeed = ballSpeed;
-        let ballX = boardWidth / 2 - ball.clientWidth / 2;
-        let ballY = boardHeight / 2 - ball.clientHeight / 2;
-        let paddleLeftY = boardHeight / 2 - paddleLeft.clientHeight / 2;
-        let paddleRightY = boardHeight / 2 - paddleRight.clientHeight / 2;
+        const ball = document.getElementById("ball");
+        const paddleLeft = document.getElementById("paddle-left");
+        const paddleRight = document.getElementById("paddle-right");
+        const scoreDisplay = document.getElementById("score");
+        const upButton = document.getElementById("up-button");
+        const downButton = document.getElementById("down-button");
 
-        upButton.addEventListener('click', () => {
+        let ballX = 0;
+        let ballY = 0;
+        let ballSpeedX = 5;
+        let ballSpeedY = 5;
+        let paddleLeftY = 50;
+        let paddleRightY = 50;
+        let leftScore = 0;
+        let rightScore = 0;
+
+        function update() {
+            // Move ball
+            ballX += ballSpeedX;
+            ballY += ballSpeedY;
+
+            // Ball collisions with top and bottom walls
+            if (ballY <= 0 || ballY >= window.innerHeight) {
+                ballSpeedY *= -1;
+            }
+
+            // Ball collisions with paddles
+            if (
+                ballX <= 15 &&
+                ballY >= paddleLeftY &&
+                ballY <= paddleLeftY + 100
+            ) {
+                ballSpeedX *= -1;
+            }
+            if (
+                ballX >= window.innerWidth - 35 &&
+                ballY >= paddleRightY &&
+                ballY <= paddleRightY + 100
+            ) {
+                ballSpeedX *= -1;
+            }
+
+            // Ball out of bounds
+            if (ballX < 0) {
+                // Right player scores a point
+                rightScore++;
+                reset();
+            }
+            if (ballX > window.innerWidth - 20) {
+                // Left player scores a point
+                leftScore++;
+                reset();
+            }
+
+            // Update paddles' positions
+            paddleLeft.style.top = `${paddleLeftY}px`;
+            paddleRight.style.top = `${paddleRightY}px`;
+
+            // Update the ball's position
+            ball.style.left = `${ballX}px`;
+            ball.style.top = `${ballY}px`;
+
+            // Update the score display
+            scoreDisplay.textContent = `${leftScore} - ${rightScore}`;
+        }
+
+        function reset() {
+            ballX = window.innerWidth / 2;
+            ballY = window.innerHeight / 2;
+            ballSpeedX *= -1;
+        }
+
+        // Event listeners for mobile buttons
+        upButton.addEventListener("click", () => {
             if (paddleLeftY > 0) {
                 paddleLeftY -= 10;
             }
         });
 
-        downButton.addEventListener('click', () => {
-            if (paddleLeftY + paddleLeft.clientHeight < boardHeight) {
+        downButton.addEventListener("click", () => {
+            if (paddleLeftY < window.innerHeight - 100) {
                 paddleLeftY += 10;
             }
         });
 
-        function updateGame() {
-            // AI-controlled movement for the right paddle
-            const paddleSpeed = 4;
-            if (ballY < paddleRightY + paddleRight.clientHeight / 2) {
-                paddleRightY -= paddleSpeed;
-            } else {
-                paddleRightY += paddleSpeed;
-            }
-
-            // Move ball
-            ballX += ballXSpeed;
-            ballY += ballYSpeed;
-
-            // Check collisions with top and bottom walls
-            if (ballY < 0 || ballY + ball.clientHeight > boardHeight) {
-                ballYSpeed = -ballYSpeed;
-            }
-
-            // Check collisions with paddles
-            if (
-                ballX < paddleLeft.clientWidth &&
-                ballY + ball.clientHeight >= paddleLeftY &&
-                ballY <= paddleLeftY + paddleLeft.clientHeight
-            ) {
-                ballXSpeed = -ballXSpeed;
-            }
-            if (
-                ballX + ball.clientWidth > boardWidth - paddleRight.clientWidth &&
-                ballY + ball.clientHeight >= paddleRightY &&
-                ballY <= paddleRightY + paddleRight.clientHeight
-            ) {
-                ballXSpeed = -ballXSpeed;
-            }
-
-            // Check if the ball goes out of bounds
-            if (ballX < 0 || ballX + ball.clientWidth > boardWidth) {
-                // Reset ball position
-                ballX = boardWidth / 2 - ball.clientWidth / 2;
-                ballY = boardHeight / 2 - ball.clientHeight / 2;
-            }
-
-            // Update the positions
-            ball.style.left = ballX + 'px';
-            ball.style.top = ballY + 'px';
-            paddleLeft.style.top = paddleLeftY + 'px';
-            paddleRight.style.top = paddleRightY + 'px';
-
-            requestAnimationFrame(updateGame);
-        }
-
-        function startGame() {
-            requestAnimationFrame(updateGame);
-        }
-
-        startGame();
+        // Game loop
+        setInterval(update, 1000 / 60);
     </script>
 </body>
 </html>
