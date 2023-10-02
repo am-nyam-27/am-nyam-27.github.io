@@ -69,24 +69,23 @@
         let paddleRightY = boardHeight / 2 - paddleRight.clientHeight / 2;
 
         // Touch event variables
-        let touchStartY = 0;
-        let touchEndY = 0;
+        let touchStartYLeft = 0;
+        let touchStartYRight = 0;
 
         function updateGame() {
             // Move paddles
-            if (touchEndY < touchStartY && paddleLeftY > 0) {
+            if (touchStartYLeft < paddleLeftY && paddleLeftY > 0) {
                 paddleLeftY -= 10;
             }
-            if (touchEndY > touchStartY && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
+            if (touchStartYLeft > paddleLeftY && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
                 paddleLeftY += 10;
             }
 
-            // AI-controlled movement for the right paddle
-            const paddleSpeed = 4;
-            if (ballY < paddleRightY + paddleRight.clientHeight / 2) {
-                paddleRightY -= paddleSpeed;
-            } else {
-                paddleRightY += paddleSpeed;
+            if (touchStartYRight < paddleRightY && paddleRightY > 0) {
+                paddleRightY -= 10;
+            }
+            if (touchStartYRight > paddleRightY && paddleRightY + paddleRight.clientHeight < boardHeight) {
+                paddleRightY += 10;
             }
 
             // Move ball
@@ -136,16 +135,26 @@
 
         // Touch event handlers
         gameBoard.addEventListener('touchstart', (e) => {
-            touchStartY = e.touches[0].clientY;
+            const touchY = e.touches[0].clientY;
+            if (e.touches[0].clientX < boardWidth / 2) {
+                touchStartYLeft = touchY;
+            } else {
+                touchStartYRight = touchY;
+            }
         });
 
         gameBoard.addEventListener('touchmove', (e) => {
-            touchEndY = e.touches[0].clientY;
+            const touchY = e.touches[0].clientY;
+            if (e.touches[0].clientX < boardWidth / 2) {
+                touchStartYLeft = touchY;
+            } else {
+                touchStartYRight = touchY;
+            }
         });
 
         gameBoard.addEventListener('touchend', () => {
-            touchStartY = 0;
-            touchEndY = 0;
+            touchStartYLeft = 0;
+            touchStartYRight = 0;
         });
 
         startGame();
