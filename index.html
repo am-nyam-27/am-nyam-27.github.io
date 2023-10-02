@@ -44,6 +44,23 @@
         #paddle-right {
             right: 10px;
         }
+
+        .control-buttons {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .control-buttons button {
+            width: 40px;
+            height: 40px;
+            background-color: green;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            margin: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -51,6 +68,10 @@
         <div id="ball"></div>
         <div id="paddle-left"></div>
         <div id="paddle-right"></div>
+        <div class="control-buttons">
+            <button id="up-button">Up</button>
+            <button id="down-button">Down</button>
+        </div>
     </div>
 
     <script>
@@ -58,6 +79,8 @@
         const ball = document.getElementById('ball');
         const paddleLeft = document.getElementById('paddle-left');
         const paddleRight = document.getElementById('paddle-right');
+        const upButton = document.getElementById('up-button');
+        const downButton = document.getElementById('down-button');
         const boardWidth = gameBoard.clientWidth;
         const boardHeight = gameBoard.clientHeight;
         const ballSpeed = 5;
@@ -68,24 +91,25 @@
         let paddleLeftY = boardHeight / 2 - paddleLeft.clientHeight / 2;
         let paddleRightY = boardHeight / 2 - paddleRight.clientHeight / 2;
 
-        // Touch event variables
-        let touchStartYLeft = 0;
-        let touchStartYRight = 0;
-
-        function updateGame() {
-            // Move paddles
-            if (touchStartYLeft < paddleLeftY && paddleLeftY > 0) {
+        upButton.addEventListener('click', () => {
+            if (paddleLeftY > 0) {
                 paddleLeftY -= 10;
             }
-            if (touchStartYLeft > paddleLeftY && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
+        });
+
+        downButton.addEventListener('click', () => {
+            if (paddleLeftY + paddleLeft.clientHeight < boardHeight) {
                 paddleLeftY += 10;
             }
+        });
 
-            if (touchStartYRight < paddleRightY && paddleRightY > 0) {
-                paddleRightY -= 10;
-            }
-            if (touchStartYRight > paddleRightY && paddleRightY + paddleRight.clientHeight < boardHeight) {
-                paddleRightY += 10;
+        function updateGame() {
+            // AI-controlled movement for the right paddle
+            const paddleSpeed = 4;
+            if (ballY < paddleRightY + paddleRight.clientHeight / 2) {
+                paddleRightY -= paddleSpeed;
+            } else {
+                paddleRightY += paddleSpeed;
             }
 
             // Move ball
@@ -132,30 +156,6 @@
         function startGame() {
             requestAnimationFrame(updateGame);
         }
-
-        // Touch event handlers
-        gameBoard.addEventListener('touchstart', (e) => {
-            const touchY = e.touches[0].clientY;
-            if (e.touches[0].clientX < boardWidth / 2) {
-                touchStartYLeft = touchY;
-            } else {
-                touchStartYRight = touchY;
-            }
-        });
-
-        gameBoard.addEventListener('touchmove', (e) => {
-            const touchY = e.touches[0].clientY;
-            if (e.touches[0].clientX < boardWidth / 2) {
-                touchStartYLeft = touchY;
-            } else {
-                touchStartYRight = touchY;
-            }
-        });
-
-        gameBoard.addEventListener('touchend', () => {
-            touchStartYLeft = 0;
-            touchStartYRight = 0;
-        });
 
         startGame();
     </script>
