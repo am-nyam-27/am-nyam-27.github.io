@@ -67,15 +67,17 @@
         let ballY = boardHeight / 2 - ball.clientHeight / 2;
         let paddleLeftY = boardHeight / 2 - paddleLeft.clientHeight / 2;
         let paddleRightY = boardHeight / 2 - paddleRight.clientHeight / 2;
-        let isMovingUp = false;
-        let isMovingDown = false;
+
+        // Touch event variables
+        let touchStartY = 0;
+        let touchEndY = 0;
 
         function updateGame() {
             // Move paddles
-            if (isMovingUp && paddleLeftY > 0) {
+            if (touchEndY < touchStartY && paddleLeftY > 0) {
                 paddleLeftY -= 10;
             }
-            if (isMovingDown && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
+            if (touchEndY > touchStartY && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
                 paddleLeftY += 10;
             }
 
@@ -132,20 +134,18 @@
             requestAnimationFrame(updateGame);
         }
 
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'ArrowUp') {
-                isMovingUp = true;
-            } else if (event.key === 'ArrowDown') {
-                isMovingDown = true;
-            }
+        // Touch event handlers
+        gameBoard.addEventListener('touchstart', (e) => {
+            touchStartY = e.touches[0].clientY;
         });
 
-        document.addEventListener('keyup', function (event) {
-            if (event.key === 'ArrowUp') {
-                isMovingUp = false;
-            } else if (event.key === 'ArrowDown') {
-                isMovingDown = false;
-            }
+        gameBoard.addEventListener('touchmove', (e) => {
+            touchEndY = e.touches[0].clientY;
+        });
+
+        gameBoard.addEventListener('touchend', () => {
+            touchStartY = 0;
+            touchEndY = 0;
         });
 
         startGame();
