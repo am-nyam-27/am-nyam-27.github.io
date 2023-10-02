@@ -144,6 +144,27 @@
             ballSpeedX *= -1;
         }
 
+        // Prevent text selection when holding buttons
+        upButton.addEventListener("touchstart", (event) => {
+            event.preventDefault();
+            upButtonPressed = true;
+        });
+
+        upButton.addEventListener("touchend", (event) => {
+            event.preventDefault();
+            upButtonPressed = false;
+        });
+
+        downButton.addEventListener("touchstart", (event) => {
+            event.preventDefault();
+            downButtonPressed = true;
+        });
+
+        downButton.addEventListener("touchend", (event) => {
+            event.preventDefault();
+            downButtonPressed = false;
+        });
+
         // Event listeners for touch events on mobile
         upButton.addEventListener("touchstart", () => {
             upButtonPressed = true;
