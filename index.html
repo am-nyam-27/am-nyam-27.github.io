@@ -1,44 +1,36 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Meowing Cat</title>
-    <style>
-        /* Add some basic styles to center the cat */
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        /* Define the cat animation frames */
-        @keyframes cat-animation {
-            0% { content: "  /\\_/\\   "; }
-            25% { content: " ( o.o )  "; }
-            50% { content: " > ^ <   "; }
-            75% { content: " ( -.- )  "; }
-            100% { content: "  /\\_/\\   "; }
-        }
-        /* Style the cat container */
-        #cat {
-            font-family: monospace;
-            font-size: 2em;
-            animation: cat-animation 2s infinite;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* CSS for the cat animation */
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% {
+        transform: translateY(0);
+      }
+      40% {
+        transform: translateY(-10px);
+      }
+      60% {
+        transform: translateY(-5px);
+      }
+    }
+    .cat {
+      font-size: 40px;
+      animation: bounce 1s infinite;
+      cursor: pointer;
+    }
+  </style>
+  <script>
+    // JavaScript to play meow sound on click
+    function playMeowSound() {
+      const audio = new Audio('meow.mp3');
+      audio.play();
+    }
+  </script>
 </head>
 <body>
-    <!-- Cat container that will meow on click -->
-    <div id="cat" onclick="meow()">  /\\_/\\   </div>
-
-    <!-- JavaScript function to play the meow sound -->
-    <script>
-        function meow() {
-            const audio = new Audio('meow.mp3'); // Replace 'meow.mp3' with your audio file
-            audio.play();
-        }
-    </script>
+  <div class="cat" onclick="playMeowSound()">＼(=^‥^)/</div>
 </body>
 </html>
