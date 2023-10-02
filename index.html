@@ -144,45 +144,64 @@
             ballSpeedX *= -1;
         }
 
-        // Prevent text selection when holding buttons
-        upButton.addEventListener("touchstart", (event) => {
-            event.preventDefault();
-            upButtonPressed = true;
-        });
+        // Variables to keep track of button state
+        let touchStartUp = false;
+        let touchStartDown = false;
 
-        upButton.addEventListener("touchend", (event) => {
-            event.preventDefault();
-            upButtonPressed = false;
-        });
+        // Function to handle touch start events
+        function handleTouchStart(event) {
+            if (event.target === upButton) {
+                touchStartUp = true;
+            } else if (event.target === downButton) {
+                touchStartDown = true;
+            }
+        }
 
-        downButton.addEventListener("touchstart", (event) => {
-            event.preventDefault();
-            downButtonPressed = true;
-        });
-
-        downButton.addEventListener("touchend", (event) => {
-            event.preventDefault();
-            downButtonPressed = false;
-        });
+        // Function to handle touch end events
+        function handleTouchEnd(event) {
+            if (event.target === upButton) {
+                touchStartUp = false;
+            } else if (event.target === downButton) {
+                touchStartDown = false;
+            }
+        }
 
         // Event listeners for touch events on mobile
-    upButton.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Prevent text selection
-        upButtonPressed = true;
-    });
+        upButton.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Prevent text selection
+            handleTouchStart(e);
+        });
 
-    upButton.addEventListener("touchend", () => {
-        upButtonPressed = false;
-    });
+        upButton.addEventListener("touchend", (e) => {
+            e.preventDefault(); // Prevent text selection
+            handleTouchEnd(e);
+        });
 
-    downButton.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Prevent text selection
-        downButtonPressed = true;
-    });
+        downButton.addEventListener("touchstart", (e) => {
+            e.preventDefault(); // Prevent text selection
+            handleTouchStart(e);
+        });
 
-    downButton.addEventListener("touchend", () => {
-        downButtonPressed = false;
-    });
+        downButton.addEventListener("touchend", (e) => {
+            e.preventDefault(); // Prevent text selection
+            handleTouchEnd(e);
+        });
+
+        // Function to continuously check button states and update paddle position
+        function checkButtonState() {
+            if (touchStartUp && paddleLeftY > 0) {
+                paddleLeftY -= 10;
+            }
+            if (touchStartDown && paddleLeftY < window.innerHeight - 100) {
+                paddleLeftY += 10;
+            }
+        }
+
+        // Game loop
+        setInterval(() => {
+            checkButtonState();
+            update();
+        }, 1000 / 60);
     </script>
 </body>
 </html>
