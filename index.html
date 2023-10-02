@@ -45,8 +45,7 @@
         #buttons {
             position: absolute;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 10px;
             text-align: center;
         }
         button {
@@ -146,20 +145,35 @@
         }
 
         // Event listeners for mobile buttons
-        upButton.addEventListener("click", () => {
-            if (paddleLeftY > 0) {
-                paddleLeftY -= 10;
-            }
+        let upButtonPressed = false;
+        let downButtonPressed = false;
+
+        upButton.addEventListener("mousedown", () => {
+            upButtonPressed = true;
         });
 
-        downButton.addEventListener("click", () => {
-            if (paddleLeftY < window.innerHeight - 100) {
-                paddleLeftY += 10;
-            }
+        upButton.addEventListener("mouseup", () => {
+            upButtonPressed = false;
+        });
+
+        downButton.addEventListener("mousedown", () => {
+            downButtonPressed = true;
+        });
+
+        downButton.addEventListener("mouseup", () => {
+            downButtonPressed = false;
         });
 
         // Game loop
-        setInterval(update, 1000 / 60);
+        setInterval(() => {
+            if (upButtonPressed && paddleLeftY > 0) {
+                paddleLeftY -= 10;
+            }
+            if (downButtonPressed && paddleLeftY < window.innerHeight - 100) {
+                paddleLeftY += 10;
+            }
+            update();
+        }, 1000 / 60);
     </script>
 </body>
 </html>
