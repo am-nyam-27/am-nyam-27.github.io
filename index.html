@@ -166,21 +166,23 @@
         });
 
         // Event listeners for touch events on mobile
-        upButton.addEventListener("touchstart", () => {
-            upButtonPressed = true;
-        });
+    upButton.addEventListener("touchstart", (e) => {
+        e.preventDefault(); // Prevent text selection
+        upButtonPressed = true;
+    });
 
-        upButton.addEventListener("touchend", () => {
-            upButtonPressed = false;
-        });
+    upButton.addEventListener("touchend", () => {
+        upButtonPressed = false;
+    });
 
-        downButton.addEventListener("touchstart", () => {
-            downButtonPressed = true;
-        });
+    downButton.addEventListener("touchstart", (e) => {
+        e.preventDefault(); // Prevent text selection
+        downButtonPressed = true;
+    });
 
-        downButton.addEventListener("touchend", () => {
-            downButtonPressed = false;
-        });
+    downButton.addEventListener("touchend", () => {
+        downButtonPressed = false;
+    });
     </script>
 </body>
 </html>
