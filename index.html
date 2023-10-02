@@ -1,36 +1,146 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* CSS for the cat animation */
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% {
-        transform: translateY(0);
-      }
-      40% {
-        transform: translateY(-10px);
-      }
-      60% {
-        transform: translateY(-5px);
-      }
-    }
-    .cat {
-      font-size: 40px;
-      animation: bounce 1s infinite;
-      cursor: pointer;
-    }
-  </style>
-  <script>
-    // JavaScript to play meow sound on click
-    function playMeowSound() {
-      const audio = new Audio('meow.mp3');
-      audio.play();
-    }
-  </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping-Pong Game</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #game-board {
+            width: 600px;
+            height: 400px;
+            background-color: white;
+            position: relative;
+        }
+
+        #ball {
+            width: 20px;
+            height: 20px;
+            background-color: red;
+            border-radius: 50%;
+            position: absolute;
+        }
+
+        #paddle-left, #paddle-right {
+            width: 10px;
+            height: 80px;
+            background-color: blue;
+            position: absolute;
+        }
+
+        #paddle-left {
+            left: 10px;
+        }
+
+        #paddle-right {
+            right: 10px;
+        }
+    </style>
 </head>
 <body>
-  <div class="cat" onclick="playMeowSound()">＼(=^‥^)/</div>
+    <div id="game-board">
+        <div id="ball"></div>
+        <div id="paddle-left"></div>
+        <div id="paddle-right"></div>
+    </div>
+
+    <script>
+        const gameBoard = document.getElementById('game-board');
+        const ball = document.getElementById('ball');
+        const paddleLeft = document.getElementById('paddle-left');
+        const paddleRight = document.getElementById('paddle-right');
+        const boardWidth = gameBoard.clientWidth;
+        const boardHeight = gameBoard.clientHeight;
+        const ballSpeed = 5;
+        let ballXSpeed = ballSpeed;
+        let ballYSpeed = ballSpeed;
+        let ballX = boardWidth / 2 - ball.clientWidth / 2;
+        let ballY = boardHeight / 2 - ball.clientHeight / 2;
+        let paddleLeftY = boardHeight / 2 - paddleLeft.clientHeight / 2;
+        let paddleRightY = boardHeight / 2 - paddleRight.clientHeight / 2;
+        let isMovingUp = false;
+        let isMovingDown = false;
+
+        function updateGame() {
+            // Move paddles
+            if (isMovingUp && paddleLeftY > 0) {
+                paddleLeftY -= 10;
+            }
+            if (isMovingDown && paddleLeftY + paddleLeft.clientHeight < boardHeight) {
+                paddleLeftY += 10;
+            }
+
+            // Move ball
+            ballX += ballXSpeed;
+            ballY += ballYSpeed;
+
+            // Check collisions with top and bottom walls
+            if (ballY < 0 || ballY + ball.clientHeight > boardHeight) {
+                ballYSpeed = -ballYSpeed;
+            }
+
+            // Check collisions with paddles
+            if (
+                ballX < paddleLeft.clientWidth &&
+                ballY + ball.clientHeight >= paddleLeftY &&
+                ballY <= paddleLeftY + paddleLeft.clientHeight
+            ) {
+                ballXSpeed = -ballXSpeed;
+            }
+            if (
+                ballX + ball.clientWidth > boardWidth - paddleRight.clientWidth &&
+                ballY + ball.clientHeight >= paddleRightY &&
+                ballY <= paddleRightY + paddleRight.clientHeight
+            ) {
+                ballXSpeed = -ballXSpeed;
+            }
+
+            // Check if the ball goes out of bounds
+            if (ballX < 0 || ballX + ball.clientWidth > boardWidth) {
+                // Reset ball position
+                ballX = boardWidth / 2 - ball.clientWidth / 2;
+                ballY = boardHeight / 2 - ball.clientHeight / 2;
+            }
+
+            // Update the positions
+            ball.style.left = ballX + 'px';
+            ball.style.top = ballY + 'px';
+            paddleLeft.style.top = paddleLeftY + 'px';
+            paddleRight.style.top = paddleRightY + 'px';
+
+            requestAnimationFrame(updateGame);
+        }
+
+        function startGame() {
+            requestAnimationFrame(updateGame);
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowUp') {
+                isMovingUp = true;
+            } else if (event.key === 'ArrowDown') {
+                isMovingDown = true;
+            }
+        });
+
+        document.addEventListener('keyup', function (event) {
+            if (event.key === 'ArrowUp') {
+                isMovingUp = false;
+            } else if (event.key === 'ArrowDown') {
+                isMovingDown = false;
+            }
+        });
+
+        startGame();
+    </script>
 </body>
 </html>
