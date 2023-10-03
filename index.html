@@ -11,94 +11,67 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background-color: #222;
-        }
-
-        #game-board {
-            width: 600px;
-            height: 400px;
             background-color: #333;
-            position: relative;
         }
-
-        .paddle {
-            width: 10px;
-            height: 100px;
-            background-color: white;
-            position: absolute;
-        }
-
-        #left-paddle {
-            left: 0;
-        }
-
-        #right-paddle {
-            right: 0;
-        }
-
-        .ball {
-            width: 20px;
-            height: 20px;
-            background-color: red;
-            border-radius: 50%;
-            position: absolute;
+        canvas {
+            border: 1px solid #fff;
         }
     </style>
 </head>
 <body>
-    <div id="game-board">
-        <div class="paddle" id="left-paddle"></div>
-        <div class="paddle" id="right-paddle"></div>
-        <div class="ball" id="ball"></div>
-    </div>
-
+    <canvas id="pingPongCanvas" width="800" height="400"></canvas>
     <script>
-        const gameBoard = document.getElementById("game-board");
-        const leftPaddle = document.getElementById("left-paddle");
-        const rightPaddle = document.getElementById("right-paddle");
-        const ball = document.getElementById("ball");
-
-        let ballX = 290;
-        let ballY = 190;
-        let ballSpeedX = 5;
-        let ballSpeedY = 5;
-
-        function movePaddle() {
-            const mouseY = ballY - gameBoard.getBoundingClientRect().top;
-            const paddleSpeed = 5;
-
-            if (rightPaddle.getBoundingClientRect().top + rightPaddle.clientHeight / 2 < mouseY) {
-                rightPaddle.style.top = (rightPaddle.getBoundingClientRect().top + paddleSpeed) + "px";
-            } else {
-                rightPaddle.style.top = (rightPaddle.getBoundingClientRect().top - paddleSpeed) + "px";
-            }
+        const canvas = document.getElementById("pingPongCanvas");
+        const ctx = canvas.getContext("2d");
+        
+        const paddleWidth = 10;
+        const paddleHeight = 100;
+        const ballRadius = 10;
+        
+        let x = canvas.width / 2;
+        let y = canvas.height / 2;
+        let dx = 5;
+        let dy = 5;
+        
+        let leftPaddleY = canvas.height / 2 - paddleHeight / 2;
+        let rightPaddleY = canvas.height / 2 - paddleHeight / 2;
+        
+        function drawPaddle(x, y) {
+            ctx.fillRect(x, y, paddleWidth, paddleHeight);
         }
-
+        
+        function drawBall() {
+            ctx.beginPath();
+            ctx.arc(x, y, ballRadius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.closePath();
+        }
+        
         function update() {
-            ballX += ballSpeedX;
-            ballY += ballSpeedY;
-
-            if (ballX <= 0 || ballX >= gameBoard.clientWidth - ball.clientWidth) {
-                ballSpeedX *= -1;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Move the paddles automatically
+            leftPaddleY = y - paddleHeight / 2;
+            rightPaddleY = y - paddleHeight / 2;
+            
+            drawPaddle(0, leftPaddleY);
+            drawPaddle(canvas.width - paddleWidth, rightPaddleY);
+            
+            drawBall();
+            
+            if (x + dx > canvas.width - ballRadius || x + dx < ballRadius) {
+                dx = -dx;
             }
-
-            if (ballY <= 0 || ballY >= gameBoard.clientHeight - ball.clientHeight) {
-                ballSpeedY *= -1;
+            
+            if (y + dy > canvas.height - ballRadius || y + dy < ballRadius) {
+                dy = -dy;
             }
-
-            if (ballX <= leftPaddle.clientWidth && ballY >= leftPaddle.getBoundingClientRect().top && ballY <= leftPaddle.getBoundingClientRect().bottom) {
-                ballSpeedX *= -1;
-            }
-
-            movePaddle();
-
-            ball.style.left = ballX + "px";
-            ball.style.top = ballY + "px";
-
-            requestAnimationFrame(update);
+            
+            x += dx;
+            y += dy;
         }
-
-        update();
+        
+        setInterval(update, 20);
     </script>
 </body>
 </html>
